@@ -17,10 +17,10 @@
  * @author          XOOPS Module Development Team
  * @author          Mamba
  * @author          Herve Thouzard
- * @copyright       {@link http://xoops.org 2001-2016 XOOPS Project}
+ * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
  * @copyright       Herve Thouzard
  * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            http://xoops.org XOOPS
+ * @link            https://xoops.org XOOPS
  * @since           2.00
  */
 

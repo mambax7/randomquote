@@ -16,9 +16,9 @@
  * @package         randomquote
  * @author          XOOPS Module Development Team
  * @author          Mamba
- * @copyright       {@link http://xoops.org 2001-2016 XOOPS Project}
+ * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
  * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            http://xoops.org XOOPS
+ * @link            https://xoops.org XOOPS
  * @since           2.00
  */
 
@@ -39,7 +39,7 @@ $modversion = array(
     //1 if supported by XOOPS CORE Dev Team, 0 otherwise
     'author'              => 'XOOPS Module Development Team',
     //          'author_mail' => 'webmaster@xoops.org',
-    'author_website_url'  => 'http://xoops.org',
+    'author_website_url'  => 'https://xoops.org',
     'author_website_name' => 'XOOPS Project',
     'credits'             => 'XOOPS Module Development Team',
     'license'             => 'GPL 2.0 or later',
@@ -71,11 +71,11 @@ $modversion = array(
     // About
     //            'release_info' => 'module_release_info',
     //            'release_file' => XOOPS_URL . "/modules/{$moduleDirName}/docs/module_release_info file",
-    //           'demo_site_url' => "http://xoops.org",
+    //           'demo_site_url' => "https://xoops.org",
     //          'demo_site_name' => 'XOOPS Demo Site',
-    //          'forum_site_url' => "http://xoops.org",
+    //          'forum_site_url' => "https://xoops.org",
     //         'forum_site_name' => 'XOOPS Project',
-    'module_website_url'  => 'http://xoops.org/modules/newbb',
+    'module_website_url'  => 'https://xoops.org/modules/newbb',
     'module_website_name' => 'XOOPS Project',
 
     // Admin things

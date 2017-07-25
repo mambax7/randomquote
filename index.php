@@ -15,9 +15,9 @@
  * @category        Module
  * @package         randomquote
  * @author          XOOPS Module Development Team
- * @copyright       {@link http://xoops.org 2001-2016 XOOPS Project}
+ * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
  * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            http://xoops.org XOOPS
+ * @link            https://xoops.org XOOPS
  */
 
 require_once __DIR__ . '/header.php';
@@ -53,7 +53,7 @@ $GLOBALS['xoopsTpl']->assign(array('xoops_mpageurl'  => $GLOBALS['xoops']->url("
                                    //                                 'social_bookmarks' => $GLOBALS['xoopsModuleConfig']['social_bookmarks'],
                                    //                                       'fbcomments' => $GLOBALS['xoopsModuleConfig']['fbcomments'],
                                    'admin'           => $GLOBALS['xoops']->url("www/modules/{$moduleDirName}/admin/index.php"),
-                                   'copyright'       => "<a href='http://xoops.org' title='XOOPS Project' target='_blank'>
+                                   'copyright'       => "<a href='https://xoops.org' title='XOOPS Project' target='_blank'>
                      <img src='" . $GLOBALS['xoops']->url("www/modules/{$moduleDirName}/assets/images/logo_module.png") . "' alt='XOOPS Project'></a>",
                                    'breadcrumb'      => '<a href="' . $GLOBALS['xoops']->url('www') . '">' . _YOURHOME . '</a>  &raquo; ' . $GLOBALS['xoopsModule']->name(),));
 

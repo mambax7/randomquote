@@ -15,9 +15,9 @@
  * @package         randomquote
  * @author          XOOPS Module Development Team
  * @author          Mamba
- * @copyright       {@link http://xoops.org The XOOPS Project}
+ * @copyright       {@link https://xoops.org The XOOPS Project}
  * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            http://xoops.org XOOPS
+ * @link            https://xoops.org XOOPS
  * @since           2.00
  */
 use Xmf\Request;
