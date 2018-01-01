@@ -1,20 +1,17 @@
-<h5>2.12 RC 1 [2017-6-23]</h5>
+<h5>2.2       [2018/01/01]</h5>  Dev: Xoops 2.5.9, PHP 7.2.0               
 <hr>
-- replaced "< br />" with "< br >" (mamba)
-- added data sample (mamba)
-- replaced XoopsRequest with Request (mamba)
-- renamed Utilities to Utility (mamba)
-- started conversion to XMF (mamba)
-    - updated addInfoBoxLine entries (mamba)
-    - displayNavigation(basename(__FILE__))  (mamba)
-    - changed to ->displayButton('left') (mamba)
+- conversion to namespaces (mamba)
+- added Category (mamba)
+- PHP 7.2 updates( mamba)
+- 
 
+ 
 
-<h5>2.11 Final [2017-5-24]</h5>
+<h5>Version 2.11 Beta 2 [2017-08-04]</h5>
 <hr>
-- cosmetics
+- fix blocks (mamba)
 
-<h5>2.11 Beta 1 [2016-5-16]</h5>
+<h5>Version 2.11 Beta 1 [2016-5-16]</h5>
 <hr>
 - added breadcrumb display to top of index page
 - added display of number of offline/online/waiting quotes in Admin index
@@ -44,13 +41,16 @@
 - removed unused admin templates
 - fixed PHP version check (mamba)
 - fixed uninstall (mamba)
+- replaced "< br />" with "< br >" (mamba)
 
-<h5>2.10 Beta 1 [2016-04-16]</h5>
+
+<h5>Version 2.10 Beta 1 [2016-04-16]</h5>
 <hr>
 - Updates for XOOPS 2.5.8, PHP 7 (mamba)
 - Set min PHP to 5.5
 
-<h5>2.00 [2013-06-27]</h5>
+
+<h5Version 2.00 [2013-06-27]</h5>
 <hr>
  - original release RandomQuote 2.0 Alpha 1 (mamba)
    This module is developed from scratch using TDMCreate, but it's inspired by

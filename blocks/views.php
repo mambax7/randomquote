@@ -9,6 +9,7 @@
  WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+
 /**
  * Module: RandomQuote
  *
@@ -22,8 +23,11 @@
  * @since           2.00
  */
 
+use Xoopsmodules\randomquote;
+
 $moduleDirName = basename(dirname(__DIR__));
-require_once $GLOBALS['xoops']->path("/modules/{$moduleDirName}/class/constants.php");
+require_once $GLOBALS['xoops']->path("/modules/{$moduleDirName}/class/Constants.php");
+//require_once XOOPS_ROOT_PATH . '/modules/' . $moduleDirName . '/class/Utility.php';
 
 /**
  *
@@ -38,60 +42,65 @@ require_once $GLOBALS['xoops']->path("/modules/{$moduleDirName}/class/constants.
  *                 array {
  * @param string   [quote]
  * @param string   [author]
- *                 }
- *                 }
  */
+
 function showRandomquoteBlockViews($options)
 {
     $moduleDirName = basename(dirname(__DIR__));
+    //    require_once XOOPS_ROOT_PATH . '/modules/randomquote/class/quotes.php';
+    $utility = new randomquote\Utility();
 
-    //    xoops_load('constants', 'randomquote');
+    $quotes       = [];
+    $type_block   = $options[0];
+    $nb_quotes    = $options[1];
+    $length_title = (int)$options[2];
 
-    $citas         = array();
-    $type_block    = $options[0];
-    $nb_quotes     = (int)$options[1];
-    $length_title  = (int)$options[2];
-    $quotesHandler = xoops_getModuleHandler('quotes', $moduleDirName);
+    $quotesHandler = new randomquote\QuotesHandler($GLOBALS['xoopsDB']);
     $criteria      = new CriteriaCompo();
+    array_shift($options);
+    array_shift($options);
+    array_shift($options);
 
     switch ($type_block) {
+        // for block: quotes recent
         case 'recent':
-            $criteria->add(new Criteria('quote_status', RandomquoteConstants::STATUS_ONLINE));
-            $criteria->setSort('create_date');
+            $criteria->add(new Criteria('online', 1));
+            //            $criteria->setSort("quotes_date_created");
+            $criteria->setSort('id');
             $criteria->setOrder('DESC');
             break;
-
+        // for block: quotes today's
         case 'day':
-            $criteria->add(new Criteria('quote_status', RandomquoteConstants::STATUS_ONLINE));
-            $criteria->add(new Criteria('create_date', strtotime(date('Y/m/d')), '>='));
-            $criteria->add(new Criteria('create_date', strtotime(date('Y/m/d')) + 86400, '<='));
-            $criteria->setSort('create_date');
+            $criteria->add(new Criteria('online', 1));
+            //            $criteria->add(new Criteria("quotes_date_created", strtotime(date("Y/m/d")), ">="));
+            //            $criteria->add(new Criteria("quotes_date_created", strtotime(date("Y/m/d")) + 86400, "<="));
+            //            $criteria->setSort("quotes_date_created");
             $criteria->setOrder('ASC');
-            //            $criteria->setSort('RAND()');
+            $criteria->setSort('RAND()');
             break;
-
+        // for block: quotes random
         case 'random':
-        default:
-            $criteria->add(new Criteria('quote_status', RandomquoteConstants::STATUS_ONLINE));
+            $criteria->add(new Criteria('online', 1));
             $criteria->setSort('RAND()');
             break;
     }
 
-    if ((int)$nb_quotes > 0) {
-        $criteria->setLimit($nb_quotes);
-    }
+    $criteria->setLimit($nb_quotes);
     $quoteObjsArray = $quotesHandler->getAll($criteria);
     foreach ($quoteObjsArray as $thisQuote) {
         if ($length_title > 0) {
-            $short_quote = xoops_substr($thisQuote->getVar('quote'), 0, $length_title, $trimmarker = '...');
+            //            $short_quote = xoops_substr($thisQuote->getVar('quote'), 0, $length_title, $trimmarker = '...');
+            $short_quote = $utility::truncateHtml($thisQuote->getVar('quote'), $length_title, $ending = '...', $exact = false, $considerHtml = true);
         } else {
             $short_quote = $thisQuote->getVar('quote');
         }
-        $citas[] = array('quote'  => $short_quote,
-                         'author' => $thisQuote->getVar('author'));
+        $quotes[] = [
+            'quote'  => $short_quote,
+            'author' => $thisQuote->getVar('author')
+        ];
     }
 
-    return $citas;
+    return $quotes;
 }
 
 /**
@@ -101,7 +110,7 @@ function showRandomquoteBlockViews($options)
  */
 function editRandomquoteBlockViews($options)
 {
-    $quotes_arr = array();
+    $quotes_arr = [];
     $form       = ''
                   . _MB_RANDOMQUOTE_QUOTES_DISPLAY
                   . "\n"
@@ -109,21 +118,16 @@ function editRandomquoteBlockViews($options)
                   . "<input type='text' name='options[1]' value='{$options[1]}' size='3' maxlength='4'>&nbsp;<br>\n"
                   . ''
                   . _MB_RANDOMQUOTE_QUOTES_SHORTEN
-                  . " <input type='number' name='options[2]' value='{$options[2]} size='3' maxlength='5'' min='0' step='5'> "
+                  . " <input type='text' name='options[2]' value='{$options[2]}' size='3' maxlength='5'' min='0'>"
                   . _MB_RANDOMQUOTE_QUOTES_CHARACTERS
                   . '<br><br>';
-    /*
-        array_shift($options);
-        array_shift($options);
-        array_shift($options);
-        $form .= "" . _MB_RANDOMQUOTE_QUOTES_CATTODISPLAY . "<br>\n"
-               . "<select name='options[]' multiple='multiple' size='5'>\n"
-               . "<option value='0'" . (false === array_search(0, $options) ? "" : " selected='selected'") . ">" . _MB_RANDOMQUOTE_QUOTES_ALLCAT . "</option>\n";
-        foreach (array_keys($quotes_arr) as $i) {
-            $form .= "<option value='" . $quotes_arr[$i]->getVar('quotes_id') . "'" . (false === array_search($quotes_arr[$i]->getVar('quotes_id'), $options) ? '' : " selected='selected'") . ">"
-                   . $quotes_arr[$i]->getVar('quotes_title') . "</option>\n";
-        }
-        $form .= "</select>\n";
-    */
+
+    //    $form .= '' . _MB_XNEWSLETTER_LETTER_TITLELENGTH
+    //             . " : <input name=\"options[2]\" size=\"5\" maxlength=\"255\" value=\"" . $options[2] . "\" type=\"text\"><br><br>";
+
+    array_shift($options);
+    array_shift($options);
+    array_shift($options);
+
     return $form;
 }

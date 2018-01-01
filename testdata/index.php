@@ -1,22 +1,33 @@
 <?php
+
+/*
+ You may not change or alter any portion of this comment or credits
+ of supporting developers from this source code or any supporting source code
+ which is considered copyrighted (c) material of the original comment or credit authors.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*/
+
 /**
+ * Module: randomquote
  *
- * You may not change or alter any portion of this comment or credits
- * of supporting developers from this source code or any supporting source code
- * which is considered copyrighted (c) material of the original comment or credit authors.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * @copyright       XOOPS Project (https://xoops.org)
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
- * @package
- * @since           2.5.9
- * @author          Michael Beck (aka Mamba)
+ * @category        Module
+ * @package         randomquote
+ * @author          XOOPS Development Team <name@site.com> - <https://xoops.org>
+ * @copyright       {@link https://xoops.org/ XOOPS Project}
+ * @license         GPL 2.0 or later
+ * @link            https://xoops.org/
+ * @since           1.0.0
  */
+
+use Xoopsmodules\randomquote;
+use Xoopsmodules\randomquote\common;
 
 require_once __DIR__ . '/../../../mainfile.php';
 
+include __DIR__ . '/../preloads/autoloader.php';
 
 $op = \Xmf\Request::getCmd('op', '');
 
@@ -30,12 +41,30 @@ switch ($op) {
 
 function loadSampleData()
 {
-    //    $moduleDirName = basename(dirname(__DIR__));
-    xoops_loadLanguage('comment');
-    $items = \Xmf\Yaml::readWrapped('quotes_data.yml');
+    $moduleDirName = basename(dirname(__DIR__));
+    $helper        = randomquote\Helper::getInstance();
+    $utility       = new randomquote\Utility();
+    $configurator  = new common\Configurator();
+    // Load language files
+    $helper->loadLanguage('admin');
+    $helper->loadLanguage('modinfo');
+    $helper->loadLanguage('common');
+    $quotesData = \Xmf\Yaml::readWrapped('quotes.yml');
+    \Xmf\Database\TableLoad::truncateTable($moduleDirName . '_quotes');
+    \Xmf\Database\TableLoad::loadTableFromArray($moduleDirName . '_quotes', $quotesData);
 
-    \Xmf\Database\TableLoad::truncateTable('randomquote_quotes');
-    \Xmf\Database\TableLoad::loadTableFromArray('randomquote_quotes', $items);
+    $categoryData = \Xmf\Yaml::readWrapped('category.yml');
+    \Xmf\Database\TableLoad::truncateTable($moduleDirName . '_category');
+    \Xmf\Database\TableLoad::loadTableFromArray($moduleDirName . '_category', $categoryData);
 
-    redirect_header('../admin/main.php', 1, _CM_ACTIVE);
+    //  ---  COPY test folder files ---------------
+    if (count($configurator->copyTestFolders) > 0) {
+        //        $file = __DIR__ . '/../testdata/images/';
+        foreach (array_keys($configurator->copyTestFolders) as $i) {
+            $src  = $configurator->copyTestFolders[$i][0];
+            $dest = $configurator->copyTestFolders[$i][1];
+            $utility::xcopy($src, $dest);
+        }
+    }
+    redirect_header('../admin/index.php', 1, AM_RANDOMQUOTE_SAMPLEDATA_SUCCESS);
 }

@@ -1,36 +1,61 @@
 <?php
-/*
- You may not change or alter any portion of this comment or credits of
- supporting developers from this source code or any supporting source code
- which is considered copyrighted (c) material of the original comment or credit
- authors.
 
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
+/*
+ You may not change or alter any portion of this comment or credits
+ of supporting developers from this source code or any supporting source code
+ which is considered copyrighted (c) material of the original comment or credit authors.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
+*/
+
 /**
- * Module: RandomQuote
+ * Module: randomquote
  *
  * @category        Module
  * @package         randomquote
- * @author          XOOPS Module Development Team
- * @author          Mamba
- * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
- * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            https://xoops.org XOOPS
- * @since           2.00
+ * @author          XOOPS Development Team <name@site.com> - <https://xoops.org>
+ * @copyright       {@link https://xoops.org/ XOOPS Project}
+ * @license         GPL 2.0 or later
+ * @link            https://xoops.org/
+ * @since           1.0.0
  */
 
-include dirname(dirname(__DIR__)) . '/mainfile.php';
+use Xmf\Language;
+use Xoopsmodules\randomquote;
+
+require_once dirname(dirname(__DIR__)) . '/mainfile.php';
+require_once XOOPS_ROOT_PATH . '/header.php';
+require_once __DIR__ . '/include/common.php';
+
 $moduleDirName = basename(__DIR__);
 
-xoops_load('constants', $moduleDirName);
+/** @var randomquote\Helper $helper */
+$helper  = randomquote\Helper::getInstance();
+$utility = new randomquote\Utility();
 
-$style = "modules/{$moduleDirName}/include/style.css";
-if (file_exists($GLOBALS['xoops']->path("/{$style}"))) {
-    $GLOBALS['xoTheme']->addStylesheet($GLOBALS['xoops']->url("www/{$style}"));
-}
-$quotesHandler = xoops_getModuleHandler('quotes', $moduleDirName);
-xoops_loadLanguage('modinfo', $moduleDirName);
-xoops_loadLanguage('main', $moduleDirName);
+$quotesHandler = new randomquote\QuotesHandler($GLOBALS['xoopsDB']);
+/** @var \XoopsPersistableObjectHandler $categoryHandler */
+$categoryHandler = new randomquote\CategoryHandler($GLOBALS['xoopsDB']);
+
+$quotesPaginationLimit = $GLOBALS['xoopsModuleConfig']['userpager'];
+
+$modulePath = XOOPS_ROOT_PATH . '/modules/' . $moduleDirName;
+//require_once __DIR__ . '/include/config.php';
+//require_once __DIR__ . '/class/utility.php';
+
+//$myts = \MyTextSanitizer::getInstance();
+//$stylesheet = "modules/{$moduleDirName}/assets/css/style.css";
+//if (file_exists($GLOBALS['xoops']->path($stylesheet))) {
+//    $GLOBALS['xoTheme']->addStylesheet($GLOBALS['xoops']->url("www/{$stylesheet}"));
+//}
+//handlers
+///** @var \XoopsPersistableObjectHandler $quotesHandler */
+//$quotesHandler  = new randomquote\QuotesHandler($GLOBALS['xoopsDB']);
+///** @var \XoopsPersistableObjectHandler $categoryHandler */
+//$categoryHandler  = new randomquote\CategoryHandler($GLOBALS['xoopsDB']);
+
+// Load language files
+$helper->loadLanguage('modinfo');
+$helper->loadLanguage('main');

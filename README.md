@@ -2,7 +2,7 @@
 ## RandomQuote module for [XOOPS CMS 2.5.8+](https://xoops.org)
 [![XOOPS CMS Module](https://img.shields.io/badge/XOOPS%20CMS-Module-blue.svg)](https://xoops.org)
 [![Software License](https://img.shields.io/badge/license-GPL-brightgreen.svg?style=flat)](LICENSE)
-
+ 
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/mambax7/randomquote.svg?style=flat)](https://scrutinizer-ci.com/g/mambax7/randomquote/?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/2d27c0023ee54f0b9ba2b5d17a68b2a5)](https://www.codacy.com/app/mambax7/randomquote)
 [![Code Climate](https://img.shields.io/codeclimate/github/mambax7/randomquote.svg?style=flat)](https://codeclimate.com/github/mambax7/randomquote)
@@ -10,7 +10,7 @@
 [![Latest Pre-Release](https://img.shields.io/github/tag/XoopsModules25x/randomquote.svg?style=flat)](https://github.com/XoopsModules25x/randomquote/tags/)
 [![Latest Version](https://img.shields.io/github/release/XoopsModules25x/randomquote.svg?style=flat)](https://github.com/XoopsModules25x/randomquote/releases/)
 
-RandomQuote module for [XOOPS CMS](https://xoops.org) adds a block that show a random quote. The quotes are added/edited/deleted in the Admin section.
+**RandomQuote** module for [XOOPS CMS](https://xoops.org) adds a block that show a random quote. The quotes are added/edited/deleted in the Admin section.
 
 [![Tutorial Available](https://xoops.org/images/tutorial-available-blue.svg)](https://www.gitbook.com/book/xoops/randomquote-tutorial/) Tutorial: see [GitBook](https://www.gitbook.com/book/xoops/randomquote-tutorial/).
 To contribute to the Tutorial, [fork it on GitHub](https://github.com/XoopsDocs/randomquote-tutorial)
@@ -19,4 +19,4 @@ To contribute to the Tutorial, [fork it on GitHub](https://github.com/XoopsDocs/
 
 Please visit us on  [https://xoops.org](https://xoops.org)
 
-The upcoming "next generation" version of XOOPS CMS is being crafted on GitHub at: https://github.com/XOOPS
+Current and upcoming "next generation" versions of XOOPS CMS are being crafted on GitHub at: https://github.com/XOOPS

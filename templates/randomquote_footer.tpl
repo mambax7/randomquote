@@ -1,13 +1,22 @@
-<{* if $social_bookmarks != 0 *}>
-    <{* include file="db:system_social_bookmarks.tpl" *}>
-<{* /if *}>
-<{* if $fbcomments != 0 *}>
-    <{* include file="db:system_fbcomments.tpl" *}>
-<{* /if *}>
+<{if $bookmarks != 0}>
+    <{include file="db:system_bookmarks.tpl"}>
+<{/if}>
+
+<{if $fbcomments != 0}>
+    <{include file="db:system_fbcomments.tpl"}>
+<{/if}>
+
 <div class="left"><{$copyright}></div>
-<{if '' != $pagenav}>
-    <div class="right"><{$pagenav}></div>
+<{if $xoops_isadmin}>
+    <div class="center bold"><a href="<{$admin}>"><{$smarty.const.MD_RANDOMQUOTE_ADMIN}></a></div>
 <{/if}>
-<br><{if $xoops_isadmin}>
-    <div class="center bold"><a href="<{$admin}>"><{$smarty.const._MA_RANDOMQUOTE_ADMIN}></a></div>
-<{/if}>
+<div class="pad2 marg2">
+    <{if $comment_mode == "flat"}>
+        <{include file="db:system_comments_flat.tpl"}>
+    <{elseif $comment_mode == "thread"}>
+        <{include file="db:system_comments_thread.tpl"}>
+    <{elseif $comment_mode == "nest"}>
+        <{include file="db:system_comments_nest.tpl"}>
+    <{/if}>
+</div>
+<{include file='db:system_notification_select.tpl'}>

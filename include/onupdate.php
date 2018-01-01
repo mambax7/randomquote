@@ -1,30 +1,31 @@
 <?php
-/*
- You may not change or alter any portion of this comment or credits of
- supporting developers from this source code or any supporting source code
- which is considered copyrighted (c) material of the original comment or credit
- authors.
 
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
+/*
+ You may not change or alter any portion of this comment or credits
+ of supporting developers from this source code or any supporting source code
+ which is considered copyrighted (c) material of the original comment or credit authors.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
+*/
+
 /**
- * Module: RandomQuote
+ * Module: randomquote
  *
  * @category        Module
  * @package         randomquote
- * @author          XOOPS Module Development Team
- * @author          Mamba
- * @author          Herve Thouzard
- * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
- * @copyright       Herve Thouzard
- * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            https://xoops.org XOOPS
- * @since           2.00
+ * @author          XOOPS Development Team <name@site.com> - <https://xoops.org>
+ * @copyright       {@link https://xoops.org/ XOOPS Project}
+ * @license         GPL 2.0 or later
+ * @link            https://xoops.org/
+ * @since           1.0.0
  */
 
-if ((!defined('XOOPS_ROOT_PATH')) || !($GLOBALS['xoopsUser'] instanceof XoopsUser) || !$GLOBALS['xoopsUser']->IsAdmin()) {
+use Xoopsmodules\randomquote;
+
+if ((!defined('XOOPS_ROOT_PATH')) || !$GLOBALS['xoopsUser'] instanceof XoopsUser
+    || !$GLOBALS['xoopsUser']->IsAdmin()) {
     exit('Restricted access' . PHP_EOL);
 }
 
@@ -36,107 +37,118 @@ if ((!defined('XOOPS_ROOT_PATH')) || !($GLOBALS['xoopsUser'] instanceof XoopsUse
 function tableExists($tablename)
 {
     $result = $GLOBALS['xoopsDB']->queryF("SHOW TABLES LIKE '$tablename'");
-    return ($GLOBALS['xoopsDB']->getRowsNum($result) > 0) ? true : false;
+
+    return ($GLOBALS['xoopsDB']->getRowsNum($result) > 0);
 }
 
 /**
  *
  * Prepares system prior to attempting to install module
- * @param XoopsModule $module {@link XoopsModule}
+ * @param \XoopsModule $module {@link XoopsModule}
  *
  * @return bool true if ready to install, false if not
  */
-function xoops_module_pre_update_randomquote($module)
+function xoops_module_pre_update_randomquote(\XoopsModule $module)
 {
-    if (!class_exists('RandomquoteUtility')) {
-        xoops_load('utility', 'randomquote');
-    }
-    //check for minimum XOOPS version
-    if (!RandomquoteUtility::checkVerXoops($module)) {
-        return false;
-    }
+    /** @var randomquote\Helper $helper */
+    /** @var randomquote\Utility $utility */
+    $helper  = randomquote\Helper::getInstance();
+    $utility = new randomquote\Utility();
 
-    // check for minimum PHP version
-    if (!RandomquoteUtility::checkVerPhp($module)) {
-        return false;
-    }
-    return true;
+    $xoopsSuccess = $utility::checkVerXoops($module);
+    $phpSuccess   = $utility::checkVerPhp($module);
+    return $xoopsSuccess && $phpSuccess;
 }
 
 /**
  *
  * Performs tasks required during update of the module
- * @param XoopsModule $module {@link XoopsModule}
- * @return bool
+ * @param \XoopsModule $module {@link XoopsModule}
+ * @param null         $previousVersion
+ *
+ * @return bool true if update successful, false if not
  */
-function xoops_module_update_randomquote(XoopsModule $module, $installedVersion = null)
+
+function xoops_module_update_randomquote(\XoopsModule $module, $previousVersion = null)
 {
-    xoops_loadLanguage('admin', $module->dirname());
-    $errors = 0;
-    if (tableExists($GLOBALS['xoopsDB']->prefix('citas'))) {
-        $sql    = sprintf('ALTER TABLE ' . $GLOBALS['xoopsDB']->prefix('citas') . ' CHANGE `citas` `quote` TEXT');
-        $result = $GLOBALS['xoopsDB']->queryF($sql);
-        if (!$result) {
-            $module->setErrors(_AM_RANDOMQUOTE_UPGRADEFAILED0);
-            ++$errors;
-        }
+    $moduleDirName      = basename(dirname(__DIR__));
+    $moduleDirNameUpper = strtoupper($moduleDirName);
 
-        $sql    = sprintf('ALTER TABLE '
-                          . $GLOBALS['xoopsDB']->prefix('citas')
-                          . " ADD COLUMN `quote_status` int (10) NOT NULL default '0',"
-                          . " ADD COLUMN `quote_waiting` int (10) NOT NULL default '0',"
-                          . " ADD COLUMN `quote_online` int (10) NOT NULL default '0';");
-        $result = $GLOBALS['xoopsDB']->queryF($sql);
-        if (!$result) {
-            $module->setErrors(_AM_RANDOMQUOTE_UPGRADEFAILED1);
-            ++$errors;
-        }
+    /** @var randomquote\Helper $helper */
+    /** @var randomquote\Utility $utility */
+    /** @var randomquote\common\Configurator $configurator */
+    $helper       = randomquote\Helper::getInstance();
+    $utility      = new randomquote\Utility();
+    $configurator = new randomquote\common\Configurator();
+    $helper->loadLanguage('common');
 
-        $sql    = sprintf('ALTER TABLE ' . $GLOBALS['xoopsDB']->prefix('citas') . ' RENAME ' . $GLOBALS['xoopsDB']->prefix('randomquote_quotes'));
-        $result = $GLOBALS['xoopsDB']->queryF($sql);
-        if (!$result) {
-            $module->setErrors(_AM_RANDOMQUOTE_UPGRADEFAILED2);
-            ++$errors;
-        }
-    }
+    if ($previousVersion < 240) {
 
-    if ($installedVersion < 211) {
-        // add column for quotes table for date created
-        $result      = $GLOBALS['xoopsDB']->queryF('SHOW COLUMNS FROM ' . $GLOBALS['xoopsDB']->prefix('randomquote_quotes') . " LIKE 'create_date'");
-        $foundCreate = $GLOBALS['xoopsDB']->getRowsNum($result);
-        if (empty($foundCreate)) {
-            // column doesn't exist, so try and add it
-            $success = $GLOBALS['xoopsDB']->queryF('ALTER TABLE ' . $GLOBALS['xoopsDB']->prefix('reandomquote_quotes') . ' ADD create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER quote_status');
-            if (!$success) {
-                $module->setErrors(sprintf(_AM_RANDOMQUOTE_ERROR_COLUMN, 'create_date'));
-                ++$errors;
+        //delete old HTML templates
+        if (count($configurator->templateFolders) > 0) {
+            foreach ($configurator->templateFolders as $folder) {
+                $templateFolder = $GLOBALS['xoops']->path('modules/' . $moduleDirName . $folder);
+                if (is_dir($templateFolder)) {
+                    $templateList = array_diff(scandir($templateFolder, SCANDIR_SORT_NONE), ['..', '.']);
+                    foreach ($templateList as $k => $v) {
+                        $fileInfo = new SplFileInfo($templateFolder . $v);
+                        if ('html' === $fileInfo->getExtension() && 'index.html' !== $fileInfo->getFilename()) {
+                            if (file_exists($templateFolder . $v)) {
+                                unlink($templateFolder . $v);
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        // change status to indicate quote waiting approval
-        $sql    = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix('randomquote_quotes') . ' SET quote_status=2 WHERE `quote_waiting` > 0';
-        $result = $GLOBALS['xoopsDB']->queryF($sql);
-        if (!$result) {
-            $module->setErrors(_AM_RANDOMQUOTE_UPGRADEFAILED1);
-            ++$errors;
+        //  ---  DELETE OLD FILES ---------------
+        if (count($configurator->oldFiles) > 0) {
+            //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
+            foreach (array_keys($configurator->oldFiles) as $i) {
+                $tempFile = $GLOBALS['xoops']->path('modules/' . $moduleDirName . $configurator->oldFiles[$i]);
+                if (is_file($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
         }
 
-        // change status to indicate quote online
-        $sql    = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix('randomquote_quotes') . ' SET quote_status=1 WHERE `quote_online` > 0';
-        $result = $GLOBALS['xoopsDB']->queryF($sql);
-        if (!$result) {
-            $module->setErrors(_AM_RANDOMQUOTE_UPGRADEFAILED1);
-            ++$errors;
+        //  ---  DELETE OLD FOLDERS ---------------
+        xoops_load('XoopsFile');
+        if (count($configurator->oldFolders) > 0) {
+            //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
+            foreach (array_keys($configurator->oldFolders) as $i) {
+                $tempFolder = $GLOBALS['xoops']->path('modules/' . $moduleDirName . $configurator->oldFolders[$i]);
+                /** @var XoopsObjectHandler $folderHandler */
+                $folderHandler = \XoopsFile::getHandler('folder', $tempFolder);
+                $folderHandler->delete($tempFolder);
+            }
         }
 
-        // drop the waiting and online columns
-        $sql    = sprintf('ALTER TABLE ' . $GLOBALS['xoopsDB']->prefix('randomquote_quotes') . ' DROP COLUMN `quote_waiting`,' . ' DROP COLUMN `quote_online`;');
-        $result = $GLOBALS['xoopsDB']->queryF($sql);
-        if (!$result) {
-            $module->setErrors(_AM_RANDOMQUOTE_UPGRADEFAILED1);
-            ++$errors;
+        //  ---  CREATE FOLDERS ---------------
+        if (count($configurator->uploadFolders) > 0) {
+            //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
+            foreach (array_keys($configurator->uploadFolders) as $i) {
+                $utility::createFolder($configurator->uploadFolders[$i]);
+            }
         }
+
+        //  ---  COPY blank.png FILES ---------------
+        if (count($configurator->copyBlankFiles) > 0) {
+            $file = __DIR__ . '/../assets/images/blank.png';
+            foreach (array_keys($configurator->copyBlankFiles) as $i) {
+                $dest = $configurator->copyBlankFiles[$i] . '/blank.png';
+                $utility::copyFile($file, $dest);
+            }
+        }
+
+        //delete .html entries from the tpl table
+        $sql = 'DELETE FROM ' . $GLOBALS['xoopsDB']->prefix('tplfile') . " WHERE `tpl_module` = '" . $module->getVar('dirname', 'n') . "' AND `tpl_file` LIKE '%.html%'";
+        $GLOBALS['xoopsDB']->queryF($sql);
+
+        /** @var XoopsGroupPermHandler $gpermHandler */
+        $gpermHandler = xoops_getHandler('groupperm');
+        return $gpermHandler->deleteByModule($module->getVar('mid'), 'item_read');
     }
-
-    return $errors ? false : true;
+    return true;
 }

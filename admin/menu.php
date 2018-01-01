@@ -1,57 +1,64 @@
 <?php
-/*
- You may not change or alter any portion of this comment or credits of
- supporting developers from this source code or any supporting source code
- which is considered copyrighted (c) material of the original comment or credit
- authors.
 
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
+/*
+ You may not change or alter any portion of this comment or credits
+ of supporting developers from this source code or any supporting source code
+ which is considered copyrighted (c) material of the original comment or credit authors.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
+*/
+
 /**
- * Module: RandomQuote
+ * Module: randomquote
  *
  * @category        Module
  * @package         randomquote
- * @author          XOOPS Module Development Team
- * @author          Mamba
- * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
- * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            https://xoops.org XOOPS
- * @since           2.00
+ * @author          XOOPS Development Team <name@site.com> - <https://xoops.org>
+ * @copyright       {@link https://xoops.org/ XOOPS Project}
+ * @license         GPL 2.0 or later
+ * @link            https://xoops.org/
+ * @since           1.0.0
  */
 
-$moduleDirName = basename(dirname(__DIR__));
-if (false !== ($moduleHelper = Xmf\Module\Helper::getHelper($moduleDirName))) {
-} else {
-    $moduleHelper = Xmf\Module\Helper::getHelper('system');
-}
-$adminObject = \Xmf\Module\Admin::getInstance();
+use Xoopsmodules\randomquote;
 
+include __DIR__ . '/../preloads/autoloader.php';
+
+$helper = randomquote\Helper::getInstance();
+
+// get path to icons
 $pathIcon32    = \Xmf\Module\Admin::menuIconPath('');
-//$pathModIcon32 = $moduleHelper->getModule()->getInfo('modicons32');
+$pathModIcon32 = $helper->getModule()->getInfo('modicons32');
+$adminObject   = \Xmf\Module\Admin::getInstance();
 
-// Load language files
-$moduleHelper->loadLanguage('admin');
-$moduleHelper->loadLanguage('modinfo');
-$moduleHelper->loadLanguage('main');
-$adminmenu     = array(
-    array(
-        'title' => _MI_RANDOMQUOTE_ADMENU1,
-        'link'  => 'admin/index.php',
-        'icon'  => "{$pathIcon32}/home.png"
-    ),
+$adminmenu[] = [
+    'title' => MI_RANDOMQUOTE_ADMENU1,
+    'link'  => 'admin/index.php',
+    'icon'  => "{$pathIcon32}/home.png"
+];
 
-    array(
-        'title' => _MI_RANDOMQUOTE_ADMENU2,
-        'link'  => 'admin/main.php',
-        'icon'  => "{$pathIcon32}/content.png"
-    ),
+$adminmenu[] = [
+    'title' => MI_RANDOMQUOTE_ADMENU2,
+    'link'  => 'admin/quotes.php',
+    'icon'  => "{$pathIcon32}/insert_table_row.png"
+];
 
-    array(
-        'title' => _MI_RANDOMQUOTE_ADMENU3,
-        'link'  => 'admin/about.php',
-        'icon'  => "{$pathIcon32}/about.png"
-    )
-);
+$adminmenu[] = [
+    'title' => MI_RANDOMQUOTE_ADMENU3,
+    'link'  => 'admin/category.php',
+    'icon'  => "{$pathIcon32}/category.png"
+];
+
+$adminmenu[] = [
+    'title' => MI_RANDOMQUOTE_ADMENU4,
+    'link'  => 'admin/permissions.php',
+    'icon'  => "{$pathIcon32}/permissions.png"
+];
+
+$adminmenu[] = [
+    'title' => MI_RANDOMQUOTE_ADMENU5,
+    'link'  => 'admin/about.php',
+    'icon'  => "{$pathIcon32}/about.png"
+];

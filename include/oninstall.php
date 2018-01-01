@@ -1,49 +1,55 @@
 <?php
-/*
- You may not change or alter any portion of this comment or credits of
- supporting developers from this source code or any supporting source code
- which is considered copyrighted (c) material of the original comment or credit
- authors.
 
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
+/*
+ You may not change or alter any portion of this comment or credits
+ of supporting developers from this source code or any supporting source code
+ which is considered copyrighted (c) material of the original comment or credit authors.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
+*/
+
 /**
- * Module: RandomQuote
+ * Module: randomquote
  *
  * @category        Module
  * @package         randomquote
- * @author          XOOPS Module Development Team
- * @author          Mamba
- * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
- * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            https://xoops.org XOOPS
- * @since           2.00
+ * @author          XOOPS Development Team <name@site.com> - <https://xoops.org>
+ * @copyright       {@link https://xoops.org/ XOOPS Project}
+ * @license         GPL 2.0 or later
+ * @link            https://xoops.org/
+ * @since           1.0.0
  */
 
+use Xoopsmodules\randomquote;
+use Xoopsmodules\randomquote\common;
+
 /**
- *
  * Prepares system prior to attempting to install module
- * @param XoopsModule $module {@link XoopsModule}
+ * @param \XoopsModule $module {@link XoopsModule}
  *
  * @return bool true if ready to install, false if not
  */
-function xoops_module_pre_install_randomquote(XoopsModule $module)
+function xoops_module_pre_install_randomquote(\XoopsModule $module)
 {
-    if (!class_exists('RandomquoteUtility')) {
-        xoops_load('utility', 'randomquote');
-    }
+    include __DIR__ . '/../preloads/autoloader.php';
+    /** @var randomquote\Utility $utility */
+    $utility = new randomquote\Utility();
+
     //check for minimum XOOPS version
-    if (!RandomquoteUtility::checkVerXoops($module)) {
-        return false;
-    }
+    $xoopsSuccess = $utility::checkVerXoops($module);
 
     // check for minimum PHP version
-    if (!RandomquoteUtility::checkVerPhp($module)) {
-        return false;
+    $phpSuccess = $utility::checkVerPhp($module);
+
+    if (false !== $xoopsSuccess && false !== $phpSuccess) {
+        $moduleTables =& $module->getInfo('tables');
+        foreach ($moduleTables as $table) {
+            $GLOBALS['xoopsDB']->queryF('DROP TABLE IF EXISTS ' . $GLOBALS['xoopsDB']->prefix($table) . ';');
+        }
     }
-    return true;
+    return $xoopsSuccess && $phpSuccess;
 }
 
 /**
@@ -53,7 +59,64 @@ function xoops_module_pre_install_randomquote(XoopsModule $module)
  *
  * @return bool true if installation successful, false if not
  */
-function xoops_module_install_randomquote(XoopsModule $module)
+function xoops_module_install_randomquote(\XoopsModule $module)
 {
+    include __DIR__ . '/../preloads/autoloader.php';
+
+    $moduleDirName = basename(dirname(__DIR__));
+
+    /** @var randomquote\Helper $helper */
+    /** @var randomquote\Utility $utility */
+    /** @var common\Configurator $configurator */
+    $helper       = randomquote\Helper::getInstance();
+    $utility      = new randomquote\Utility();
+    $configurator = new common\Configurator();
+
+    // Load language files
+    $helper->loadLanguage('admin');
+    $helper->loadLanguage('modinfo');
+
+    // default Permission Settings ----------------------
+    $moduleId  = $module->getVar('mid');
+    $moduleId2 = $helper->getModule()->mid();
+    //$moduleName = $module->getVar('name');
+    $gpermHandler = xoops_getHandler('groupperm');
+    // access rights ------------------------------------------
+    $gpermHandler->addRight($moduleDirName . '_approve', 1, XOOPS_GROUP_ADMIN, $moduleId);
+    $gpermHandler->addRight($moduleDirName . '_submit', 1, XOOPS_GROUP_ADMIN, $moduleId);
+    $gpermHandler->addRight($moduleDirName . '_view', 1, XOOPS_GROUP_ADMIN, $moduleId);
+    $gpermHandler->addRight($moduleDirName . '_view', 1, XOOPS_GROUP_USERS, $moduleId);
+    $gpermHandler->addRight($moduleDirName . '_view', 1, XOOPS_GROUP_ANONYMOUS, $moduleId);
+
+    //  ---  CREATE FOLDERS ---------------
+    if (count($configurator->uploadFolders) > 0) {
+        //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
+        foreach (array_keys($configurator->uploadFolders) as $i) {
+            $utility::createFolder($configurator->uploadFolders[$i]);
+        }
+    }
+    //  ---  COPY blank.png FILES ---------------
+    if (count($configurator->copyBlankFiles) > 0) {
+        $file = __DIR__ . '/../assets/images/blank.png';
+        foreach (array_keys($configurator->copyBlankFiles) as $i) {
+            $dest = $configurator->copyBlankFiles[$i] . '/blank.png';
+            $utility::copyFile($file, $dest);
+        }
+    }
+
+    //  ---  COPY test folder files ---------------
+    if (count($configurator->copyTestFolders) > 0) {
+        //        $file = __DIR__ . '/../testdata/images/';
+        foreach (array_keys($configurator->copyTestFolders) as $i) {
+            $src  = $configurator->copyTestFolders[$i][0];
+            $dest = $configurator->copyTestFolders[$i][1];
+            $utility::xcopy($src, $dest);
+        }
+    }
+
+    //delete .html entries from the tpl table
+    $sql = 'DELETE FROM ' . $GLOBALS['xoopsDB']->prefix('tplfile') . " WHERE `tpl_module` = '" . $module->getVar('dirname', 'n') . "' AND `tpl_file` LIKE '%.html%'";
+    $GLOBALS['xoopsDB']->queryF($sql);
+
     return true;
 }

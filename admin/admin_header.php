@@ -1,70 +1,62 @@
 <?php
-/*
- You may not change or alter any portion of this comment or credits of
- supporting developers from this source code or any supporting source code
- which is considered copyrighted (c) material of the original comment or credit
- authors.
 
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
+/*
+ You may not change or alter any portion of this comment or credits
+ of supporting developers from this source code or any supporting source code
+ which is considered copyrighted (c) material of the original comment or credit authors.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
+*/
+
 /**
- * Module: RandomQuote
+ * Module: randomquote
  *
  * @category        Module
  * @package         randomquote
- * @author          XOOPS Module Development Team
- * @author          Mamba
- * @copyright       {@link https://xoops.org 2001-2016 XOOPS Project}
- * @license         {@link http://www.fsf.org/copyleft/gpl.html GNU public license}
- * @link            https://xoops.org XOOPS
- * @since           2.00
+ * @author          XOOPS Development Team <name@site.com> - <https://xoops.org>
+ * @copyright       {@link https://xoops.org/ XOOPS Project}
+ * @license         GPL 2.0 or later
+ * @link            https://xoops.org/
+ * @since           1.0.0
  */
 
+use Xmf\Request;
+use Xoopsmodules\randomquote;
+
 require_once __DIR__ . '/../../../include/cp_header.php';
-//require_once __DIR__ . '/../include/config.php';
-require_once __DIR__ . '/../class/utility.php';
+require_once __DIR__ . '/../../../class/xoopsformloader.php';
+
+//require_once __DIR__ . '/../include/common.php';
+
+include __DIR__ . '/../preloads/autoloader.php';
+
 $moduleDirName = basename(dirname(__DIR__));
 
-XoopsLoad::load('quotes', $moduleDirName);
-XoopsLoad::load('constants', $moduleDirName);
-
-if (false !== ($moduleHelper = Xmf\Module\Helper::getHelper($moduleDirName))) {
-} else {
-    $moduleHelper = Xmf\Module\Helper::getHelper('system');
-}
+/** @var randomquote\Helper $helper */
+$helper = randomquote\Helper::getInstance();
 /** @var Xmf\Module\Admin $adminObject */
-$adminObject = Xmf\Module\Admin::getInstance();
+$adminObject = \Xmf\Module\Admin::getInstance();
+$utility     = new randomquote\Utility();
 
-$myts = MyTextSanitizer::getInstance();
+//handlers
+/** @var \XoopsPersistableObjectHandler $quotesHandler */
+$quotesHandler = new randomquote\QuotesHandler($GLOBALS['xoopsDB']);
+/** @var \XoopsPersistableObjectHandler $categoryHandler */
+$categoryHandler = new randomquote\CategoryHandler($GLOBALS['xoopsDB']);
 
-if (!isset($GLOBALS['xoopsTpl']) || !($GLOBALS['xoopsTpl'] instanceof XoopsTpl)) {
-    require_once $GLOBALS['xoops']->path('class/template.php');
-    $xoopsTpl = new XoopsTpl();
+$pathIcon16    = \Xmf\Module\Admin::iconUrl('', 16);
+$pathIcon32    = \Xmf\Module\Admin::iconUrl('', 32);
+$pathModIcon32 = $helper->getModule()->getInfo('modicons32');
+
+$myts = \MyTextSanitizer::getInstance();
+if (!isset($xoopsTpl) || !is_object($xoopsTpl)) {
+    require_once XOOPS_ROOT_PATH . '/class/template.php';
+    $xoopsTpl = new \XoopsTpl();
 }
-
-$pathIcon16      = Xmf\Module\Admin::iconUrl('', 16);
-$pathIcon32      = Xmf\Module\Admin::iconUrl('', 32);
-$pathModIcon32 = $moduleHelper->getModule()->getInfo('modicons32');
-
-// Local icons path
-$xoopsTpl->assign('pathModIcon16', $pathIcon16);
-$xoopsTpl->assign('pathModIcon32', $pathIcon32);
 
 // Load language files
-$moduleHelper->loadLanguage('admin');
-$moduleHelper->loadLanguage('modinfo');
-$moduleHelper->loadLanguage('main');
-
-
-$quotesHandler   = xoops_getModuleHandler('quotes', $moduleDirName);
-
-$myts = MyTextSanitizer::getInstance();
-if (!isset($GLOBALS['xoopsTpl']) || !($GLOBALS['xoopsTpl'] instanceof XoopsTpl)) {
-    require_once $GLOBALS['xoops']->path('/class/template.php');
-    $xoopsTpl = new XoopsTpl();
-}
-
-$GLOBALS['xoopsTpl']->assign('pathIcon16', $pathIcon16);
-$GLOBALS['xoopsTpl']->assign('pathIcon32', $pathIcon32);
+$helper->loadLanguage('admin');
+$helper->loadLanguage('modinfo');
+$helper->loadLanguage('main');
